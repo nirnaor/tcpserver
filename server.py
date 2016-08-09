@@ -38,16 +38,34 @@ class Home(object):
     """Represents a home that has a lot of devices"""
     def __init__(self):
         self.devices = {}
+        self.actions = {}
 
-    def add(self, device):
+
+    def add_device(self, device):
         """Adds a device to the house"""
         self.devices[device.id] = device
 
-    def list_devices(self):
+    def add_action(self, name, action):
+        """Adds a new action that the house will support"""
+        self.actions[name] = action
+
+    def run(self, action_name, args=None):
+        """Runs action_name on the devices of the house."""
+        return self.actions[action_name].run(self.devices)
+
+class DeviceAction(object):
+    """Basic action. Each action will decide if it's working on all of the
+    devices or just one of them."""
+    pass
+
+class ListDevices(DeviceAction):
+    def run(self, devices, args=None):
         """Formats a string that lists all devices for the house"""
-        return [str(device) for device in self.devices.values()]
+        return [str(device) for device in devices.values()]
 
 HOME = Home()
-HOME.add(AirConditioner("electra"))
-HOME.add(Lamp("bulb"))
-print HOME.list_devices()
+HOME.add_device(AirConditioner("electra"))
+HOME.add_device(Lamp("bulb"))
+
+HOME.add_action("list_devices", ListDevices())
+print HOME.run("list_devices")
