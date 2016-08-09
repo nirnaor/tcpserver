@@ -5,37 +5,34 @@ class Device(object):
     """Represents a device (such as air conditioner) in the system."""
     def __init__(self, device_id):
         self.id = device_id
-        self.state = "off"
+        self.state = "on"
 
     def __str__(self):
         """Returns commaa seperated string of the device base values."""
         return "{},{}".format(self.id, self.state)
 
 class AirConditioner(Device):
+    name = "airconditioner"
     """Represents an airconditioner."""
 
     def __init__(self, device_id):
         super(AirConditioner, self).__init__(device_id)
-        self.temperature = 0
+        self.temperature = 20
 
     def __str__(self):
-        return "{},{}".format(super(AirConditioner, self).__str__(),
-                              str(self.temperature))
+        return "{},{},{},{}".format(self.id, AirConditioner.name, self.state,
+                                 self.temperature)
+                              
 
     def set_value(self, temperature):
         self.temperature = temperature
 
-    def increase_temperature(self, degrees):
-        """Increases temperature"""
-        self.temperature += degrees
-
-    def decrease_temperature(self, degrees):
-        """Increases temperature"""
-        self.temperature -= degrees
-
-
 class Lamp(Device):
+    name = "lamp"
     """Represents an airconditioner."""
+    def __str__(self):
+        return "{},{},{}".format(self.id, Lamp.name, self.state)
+                
 
 class Home(object):
     """Represents a home that has a lot of devices"""
@@ -54,7 +51,7 @@ class Home(object):
 
     def run(self, action_name, args=None):
         """Runs action_name on the devices of the house."""
-        self.devices, res =  self.actions[action_name].run(self.devices, args)
+        self.devices, res = self.actions[action_name].run(self.devices, args)
         return res
 
 class DeviceAction(object):
@@ -82,18 +79,20 @@ class SetValue(DeviceAction):
 
 
 HOME = Home()
-HOME.add_device(AirConditioner("electra"))
-HOME.add_device(Lamp("bulb"))
+HOME.add_device(Lamp("1"))
+HOME.add_device(AirConditioner("2"))
 
 HOME.add_action("list_devices", ListDevices())
 HOME.add_action("switch", Switch())
 HOME.add_action("set_value", SetValue())
 
 print HOME.run("list_devices")
-HOME.run("switch", ["bulb", "on"])
-HOME.run("switch", ["electra", "on"])
+
+HOME.run("switch", ["1", "off"])
 print HOME.run("list_devices")
-HOME.run("switch", ["electra", "off"])
+
+HOME.run("switch", ["2", "off"])
 print HOME.run("list_devices")
-HOME.run("set_value", ["electra", "5"])
+
+HOME.run("set_value", ["2", "30"])
 print HOME.run("list_devices")
