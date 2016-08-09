@@ -22,6 +22,9 @@ class AirConditioner(Device):
         return "{},{}".format(super(AirConditioner, self).__str__(),
                               str(self.temperature))
 
+    def set_value(self, temperature):
+        self.temperature = temperature
+
     def increase_temperature(self, degrees):
         """Increases temperature"""
         self.temperature += degrees
@@ -70,6 +73,13 @@ class Switch(DeviceAction):
         devices[args[0]].state = args[1]
         return devices, None
 
+class SetValue(DeviceAction):
+    def run(self, devices, args=None):
+        """Sets a new value for a device"""
+        devices[args[0]].set_value(args[1])
+        return devices, None
+
+
 
 HOME = Home()
 HOME.add_device(AirConditioner("electra"))
@@ -77,10 +87,13 @@ HOME.add_device(Lamp("bulb"))
 
 HOME.add_action("list_devices", ListDevices())
 HOME.add_action("switch", Switch())
+HOME.add_action("set_value", SetValue())
 
 print HOME.run("list_devices")
 HOME.run("switch", ["bulb", "on"])
 HOME.run("switch", ["electra", "on"])
 print HOME.run("list_devices")
 HOME.run("switch", ["electra", "off"])
+print HOME.run("list_devices")
+HOME.run("set_value", ["electra", "5"])
 print HOME.run("list_devices")
