@@ -51,7 +51,8 @@ class Home(object):
 
     def run(self, action_name, args=None):
         """Runs action_name on the devices of the house."""
-        return self.actions[action_name].run(self.devices)
+        self.devices, res =  self.actions[action_name].run(self.devices, args)
+        return res
 
 class DeviceAction(object):
     """Basic action. Each action will decide if it's working on all of the
@@ -61,11 +62,25 @@ class DeviceAction(object):
 class ListDevices(DeviceAction):
     def run(self, devices, args=None):
         """Formats a string that lists all devices for the house"""
-        return [str(device) for device in devices.values()]
+        return devices, [str(device) for device in devices.values()]
+
+class Switch(DeviceAction):
+    def run(self, devices, args=None):
+        """Sets a new state for a device"""
+        devices[args[0]].state = args[1]
+        return devices, None
+
 
 HOME = Home()
 HOME.add_device(AirConditioner("electra"))
 HOME.add_device(Lamp("bulb"))
 
 HOME.add_action("list_devices", ListDevices())
+HOME.add_action("switch", Switch())
+
+print HOME.run("list_devices")
+HOME.run("switch", ["bulb", "on"])
+HOME.run("switch", ["electra", "on"])
+print HOME.run("list_devices")
+HOME.run("switch", ["electra", "off"])
 print HOME.run("list_devices")
